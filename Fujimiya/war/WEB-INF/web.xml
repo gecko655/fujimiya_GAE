@@ -17,8 +17,8 @@
   </servlet-mapping>
   <!-- Fujimiya bot -->
   <servlet>
-  <servlet-name>senyaBot</servlet-name>
-  <servlet-class>jp.gecko655.fujimiya.bot.FujimiyaBot</servlet-class>
+      <servlet-name>fujimiyaBot</servlet-name>
+      <servlet-class>jp.gecko655.fujimiya.bot.FujimiyaBot</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>fujimiyaBot</servlet-name>

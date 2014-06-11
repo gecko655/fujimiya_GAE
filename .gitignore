@@ -1,8 +1,5 @@
 *.class
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
 # Package Files #
 *.war
 *.ear
@@ -15,19 +12,19 @@ hs_err_pid*
 *.war
 
 # gwt caches and compiled units #
-war/fujimiya/
-gwt-unitCache/
-test-classes/
-www-test/
+Fujimiya/war/fujimiya/
+Fujimiya/gwt-unitCache/
+Fujimiya/test-classes/
+Fujimiya/www-test/
 
 # boilerplate generated classes #
 .apt_generated/
 
 # more caches and things from deploy #
-war/WEB-INF/deploy/
-war/WEB-INF/classes/
+Fujimiya/war/WEB-INF/deploy/
+Fujimiya/war/WEB-INF/classes/
 
 # App engine generated #
-war/WEB-INF/appengine-generated/
+Fujimiya/war/WEB-INF/appengine-generated/
 
-.swp
+*.swp
