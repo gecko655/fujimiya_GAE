@@ -1,0 +1,2 @@
+serviceClass: jp.gecko655.fujimiya.client.GreetingService
+path: E7ACBBFC4CF0323310AFDF50A44B62C3.gwt.rpc

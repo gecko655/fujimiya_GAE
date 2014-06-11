@@ -4,9 +4,30 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+*.class
+
+# Package Files #
+*.war
+
+# gwt caches and compiled units #
+war/fujimiya/
+gwt-unitCache/
+test-classes/
+www-test/
+
+# boilerplate generated classes #
+.apt_generated/
+
+# more caches and things from deploy #
+war/WEB-INF/deploy/
+war/WEB-INF/classes/
+
+# App engine generated #
+war/WEB-INF/appengine-generated/
+
+.swp

@@ -1,0 +1,31 @@
+/test-classes
+*~
+*.patch
+*.sedbak
+*/target/*
+*/Fujimiyasearchindex/*
+*/test-output/*
+
+hs_err_pid*.log
+tomcat
+
+syntax: regexp
+\.jar$
+
+^\.pc/
+^.ant-targets-build.xml
+\.pages.xml.spdia$
+temp-testng-customsuite.xml$
+
+# eclipse and maven stuff
+^target
+
+# kde related
+\.directory$
+
+#gwt related
+^Fujimiya-war/war/WEB-INF/classes/
+^Fujimiya-war/tomcat
+\.gwt-tmp$
+^Fujimiya-war/org.fedorahosted.Fujimiya.webtrans.Application
+^Fujimiya-war/war/org.fedorahosted.Fujimiya.webtrans.Application
