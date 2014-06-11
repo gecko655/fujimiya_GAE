@@ -1,3 +1,0 @@
-# Module fujimiya
-# RPC service class, partial path of RPC policy file
-jp.gecko655.fujimiya.client.GreetingService, E7ACBBFC4CF0323310AFDF50A44B62C3.gwt.rpc
