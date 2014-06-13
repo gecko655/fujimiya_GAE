@@ -3,7 +3,7 @@
     <cron>
         <url>/cron/fujimiyaBot</url>
         <description>Fujimiya san</description>
-        <schedule>every 12 hours </schedule>
+        <schedule>every 2 hours </schedule>
         <timezone>Asia/Tokyo</timezone>
 
     </cron>
