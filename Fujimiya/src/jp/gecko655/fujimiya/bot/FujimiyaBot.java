@@ -67,7 +67,7 @@ public class FujimiyaBot extends AbstractCron{
             StatusUpdate status =new StatusUpdate(" ");
             status.media("fujimiya.jpg", new URL(getFujimiyaUrl()).openStream());
             twitter.updateStatus(status);
-            logger.log(Level.SEVERE, "Successfully tweeted");
+            logger.log(Level.INFO, "Successfully tweeted");
         } catch (TwitterException e) {
             logger.log(Level.SEVERE, "Twitter error", e);
         } catch (MalformedURLException e) {
