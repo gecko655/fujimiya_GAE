@@ -17,6 +17,22 @@
   </servlet-mapping>
   <!-- Fujimiya bot -->
   <servlet>
+      <servlet-name>fujimiyaRemove</servlet-name>
+      <servlet-class>jp.gecko655.fujimiya.bot.FujimiyaRemove</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>fujimiyaRemove</servlet-name>
+    <url-pattern>/cron/fujimiyaRemove</url-pattern>
+  </servlet-mapping>
+    <servlet>
+      <servlet-name>fujimiyaFollow</servlet-name>
+      <servlet-class>jp.gecko655.fujimiya.bot.FujimiyaFollow</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>fujimiyaFollow</servlet-name>
+    <url-pattern>/cron/fujimiyaFollow</url-pattern>
+  </servlet-mapping>
+  <servlet>
       <servlet-name>fujimiyaBot</servlet-name>
       <servlet-class>jp.gecko655.fujimiya.bot.FujimiyaBot</servlet-class>
   </servlet>

@@ -17,8 +17,11 @@ public abstract class AbstractCron extends HttpServlet{
     static String consumerKey = "E3Izw5Ye8jUDsm9xcC9XtMWIy";
     static String consumerSecret = "KsA2A4exrK0HCcEzV0KatEViRJL6jKrtcoZMgGOUfHMP0R9q4t";
     
-    static String accessToken = "614382034-LMokKg0iljTw2sXQk7xjTPXD89fw6FaVOcfVKbcy";
-    static String accessTokenSecret = "1bW5MajAJMsSd9QW3QjaRC8QmmgbYltCuzaviqs0WcXsL";
+    //For gecko535
+    //static String accessToken = "614382034-LMokKg0iljTw2sXQk7xjTPXD89fw6FaVOcfVKbcy";
+    //static String accessTokenSecret = "1bW5MajAJMsSd9QW3QjaRC8QmmgbYltCuzaviqs0WcXsL";
+    static String accessToken = "2565501103-GKLBwOVXap1GlkK8Ucocsgx9jHwSNvS9Z7zaxdj";
+    static String accessTokenSecret = "m8LqF0jf29xzUI4AiW2n588LIKxagfzDKrl7LnjIsy6nF";
     
     
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
