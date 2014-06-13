@@ -1,5 +1,7 @@
 package jp.gecko655.fujimiya.bot;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -25,12 +27,15 @@ public class FujimiyaFollow extends AbstractCron {
             List<Status> replies = twitter.getMentionsTimeline();
             for(Status reply: replies){
                 Relationship relation = twitter.friendsFollowers().showFriendship(twitter.getId(), reply.getUser().getId());
-                if(!relation.isSourceFollowingTarget()){
+                Date now = new Date();
+                if(!relation.isSourceFollowingTarget()&&
+                    ((now.getTime() - reply.getCreatedAt().getTime())<1000*60*20)
+                        ){
                     User user =twitter.createFriendship(reply.getUser().getId());
                     StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" フォローしたよ！");
                     update.setInReplyToStatusId(reply.getId());
                     twitter.updateStatus(update);
-                    logger.log(Level.INFO,"Successfully follow backed to "+reply.getUser().getScreenName());
+                    logger.log(Level.INFO,"Successfully followed back to "+reply.getUser().getScreenName());
                 }
             }
 
