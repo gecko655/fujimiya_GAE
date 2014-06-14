@@ -2,6 +2,7 @@ package jp.gecko655.fujimiya.bot;
 
 import java.util.List;
 
+import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -21,7 +22,8 @@ public class FujimiyaRemove extends AbstractCron {
             List<User> followers = twitter.getFollowersList(twitter.getId(), 20);
             for(User follower: followers){
                 twitter.destroyFriendship(follower.getId());
-                Thread.sleep(10000L);
+                twitter.updateStatus(new StatusUpdate("@"+follower.getScreenName()+" あなた誰ですか？"));
+                Thread.sleep(20000L);
             }
         } catch (IllegalStateException e) {
             // TODO Auto-generated catch block
