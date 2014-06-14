@@ -28,3 +28,6 @@ Fujimiya/war/WEB-INF/classes/
 Fujimiya/war/WEB-INF/appengine-generated/
 
 *.swp
+
+# Secret properties
+secretkeys.properties

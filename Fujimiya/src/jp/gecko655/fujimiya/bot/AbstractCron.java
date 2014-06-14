@@ -12,16 +12,12 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public abstract class AbstractCron extends HttpServlet{
 
-    static Logger logger = Logger.getLogger("Fujimiya");
+    static Logger logger = Logger.getLogger("Fujimiya"); //$NON-NLS-1$
     
-    static String consumerKey = "E3Izw5Ye8jUDsm9xcC9XtMWIy";
-    static String consumerSecret = "KsA2A4exrK0HCcEzV0KatEViRJL6jKrtcoZMgGOUfHMP0R9q4t";
-    
-    //For gecko535
-    //static String accessToken = "614382034-LMokKg0iljTw2sXQk7xjTPXD89fw6FaVOcfVKbcy";
-    //static String accessTokenSecret = "1bW5MajAJMsSd9QW3QjaRC8QmmgbYltCuzaviqs0WcXsL";
-    static String accessToken = "2565501103-GKLBwOVXap1GlkK8Ucocsgx9jHwSNvS9Z7zaxdj";
-    static String accessTokenSecret = "m8LqF0jf29xzUI4AiW2n588LIKxagfzDKrl7LnjIsy6nF";
+    static String consumerKey = Messages.getString("AbstractCron.consumerKey"); //$NON-NLS-1$
+    static String consumerSecret = Messages.getString("AbstractCron.consumerSecret"); //$NON-NLS-1$
+    static String accessToken = Messages.getString("AbstractCron.accessToken"); //$NON-NLS-1$
+    static String accessTokenSecret = Messages.getString("AbstractCron.accessTokenSecret"); //$NON-NLS-1$
     
     
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
