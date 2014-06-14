@@ -32,7 +32,7 @@ public class FujimiyaFollow extends AbstractCron {
                     ((now.getTime() - reply.getCreatedAt().getTime())<1000*60*20)
                         ){
                     User user =twitter.createFriendship(reply.getUser().getId());
-                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" フォローしたよ！");
+                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" あなたが"+reply.getUser().getName()+"くん？");
                     update.setInReplyToStatusId(reply.getId());
                     twitter.updateStatus(update);
                     logger.log(Level.INFO,"Successfully followed back to "+reply.getUser().getScreenName());
