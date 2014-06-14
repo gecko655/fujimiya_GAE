@@ -19,6 +19,9 @@ public abstract class AbstractCron extends HttpServlet{
     static String accessToken = Messages.getString("AbstractCron.accessToken"); //$NON-NLS-1$
     static String accessTokenSecret = Messages.getString("AbstractCron.accessTokenSecret"); //$NON-NLS-1$
     
+    public AbstractCron() {
+        logger.setLevel(Level.FINE);
+    }
     
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -34,8 +37,5 @@ public abstract class AbstractCron extends HttpServlet{
     
     abstract protected void twitterCron(ConfigurationBuilder cb);
 
-    public AbstractCron() {
-        // TODO Auto-generated constructor stub
-    }
 
 }
