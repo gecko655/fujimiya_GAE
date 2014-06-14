@@ -16,8 +16,6 @@ public abstract class AbstractCron extends HttpServlet{
     
     static String consumerKey = Messages.getString("AbstractCron.consumerKey"); //$NON-NLS-1$
     static String consumerSecret = Messages.getString("AbstractCron.consumerSecret"); //$NON-NLS-1$
-    
-    //For gecko535
     static String accessToken = Messages.getString("AbstractCron.accessToken"); //$NON-NLS-1$
     static String accessTokenSecret = Messages.getString("AbstractCron.accessTokenSecret"); //$NON-NLS-1$
     
