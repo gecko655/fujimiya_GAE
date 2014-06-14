@@ -23,13 +23,13 @@ public class FujimiyaBot extends AbstractCron{
     protected String getFujimiyaUrl(){
         try{
             //Get SearchResult
-            Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google");
+            Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
             Customsearch search = builder.build();
-            Customsearch.Cse.List list = search.cse().list("藤宮さん");
+            Customsearch.Cse.List list = search.cse().list("藤宮さん"); //$NON-NLS-1$
             
-            list.setCx("017321920355997682100:k2fhrksnoce");
-            list.setKey("AIzaSyAH8ddHeRCKJmKrSuRet-MGVnwJi4tP7EE");
-            list.setSearchType("image");
+            list.setCx(Messages.getString("FujimiyaBot.cx")); //$NON-NLS-1$
+            list.setKey(Messages.getString("FujimiyaBot.key")); //$NON-NLS-1$
+            list.setSearchType("image"); //$NON-NLS-1$
             list.setNum(1L);
             list.setStart((long)(Math.random()*100));
             Search results = list.execute();
@@ -50,8 +50,8 @@ public class FujimiyaBot extends AbstractCron{
 }
     protected String getTweet(Twitter twitter){
         String tweets[] = {
-                "玉子焼き作ってきたの。",
-                "http://twitpic.com/e5ytxh"
+                "玉子焼き作ってきたの。", //$NON-NLS-1$
+                "http://twitpic.com/e5ytxh" //$NON-NLS-1$
         };
         int randint = (int)(Math.random()*tweets.length);
         return tweets[randint];
@@ -64,12 +64,12 @@ public class FujimiyaBot extends AbstractCron{
         try {
             //Twitterに書き出し
            // twitter.updateStatus(message);
-            StatusUpdate status =new StatusUpdate(" ");
-            status.media("fujimiya.jpg", new URL(getFujimiyaUrl()).openStream());
+            StatusUpdate status =new StatusUpdate(" "); //$NON-NLS-1$
+            status.media("fujimiya.jpg", new URL(getFujimiyaUrl()).openStream()); //$NON-NLS-1$
             twitter.updateStatus(status);
-            logger.log(Level.INFO, "Successfully tweeted");
+            logger.log(Level.INFO, "Successfully tweeted"); //$NON-NLS-1$
         } catch (TwitterException e) {
-            logger.log(Level.SEVERE, "Twitter error", e);
+            logger.log(Level.SEVERE, "Twitter error", e); //$NON-NLS-1$
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
