@@ -1,7 +1,7 @@
 fujimiyaBot
 ===========
 
-わ、私... 月曜日には記憶がリセットされちゃうの...。
+## わ、私... 月曜日には記憶がリセットされちゃうの...。
 
 Google App Engine上で動作するTwitter Botの制御プログラムです。
 <https://twitter.com/fujimiya_monday> を動かしています。
