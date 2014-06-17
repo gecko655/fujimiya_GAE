@@ -31,10 +31,11 @@ public class FujimiyaBot extends AbstractCron{
             list.setKey(Messages.getString("FujimiyaBot.key")); //$NON-NLS-1$
             list.setSearchType("image"); //$NON-NLS-1$
             list.setNum(1L);
-            list.setStart((long)(Math.random()*100));
+            long rand = (long)Math.random()*100;
+            list.setStart(rand);
             Search results = list.execute();
             List<Result> items = results.getItems();
-            logger.log(Level.INFO,items.get(0).getLink());
+            logger.log(Level.INFO,"query: " + query+" rand :"+rand + " URL: "+items.get(0).getLink());
             return items.get(0).getLink();
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
