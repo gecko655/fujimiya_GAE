@@ -9,7 +9,7 @@ public class Fujimiya {
     @Test
     public void test() {
         FujimiyaBot bot = new FujimiyaBot();
-        bot.getFujimiyaUrl();
+        bot.getFujimiyaUrl("藤宮さん");
         //System.out.println(tweet);
     }
 

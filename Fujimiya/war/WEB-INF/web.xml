@@ -24,13 +24,22 @@
     <servlet-name>fujimiyaRemove</servlet-name>
     <url-pattern>/cron/fujimiyaRemove</url-pattern>
   </servlet-mapping>
-    <servlet>
-      <servlet-name>fujimiyaFollow</servlet-name>
-      <servlet-class>jp.gecko655.fujimiya.bot.FujimiyaFollow</servlet-class>
+
+  <servlet>
+      <servlet-name>fujimiyaLunch</servlet-name>
+      <servlet-class>jp.gecko655.fujimiya.bot.FujimiyaLunch</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>fujimiyaFollow</servlet-name>
-    <url-pattern>/cron/fujimiyaFollow</url-pattern>
+    <servlet-name>fujimiyaLunch</servlet-name>
+    <url-pattern>/cron/fujimiyaLunch</url-pattern>
+  </servlet-mapping>
+    <servlet>
+      <servlet-name>fujimiyaReply</servlet-name>
+      <servlet-class>jp.gecko655.fujimiya.bot.FujimiyaReply</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>fujimiyaReply</servlet-name>
+    <url-pattern>/cron/fujimiyaReply</url-pattern>
   </servlet-mapping>
   <servlet>
       <servlet-name>fujimiyaBot</servlet-name>

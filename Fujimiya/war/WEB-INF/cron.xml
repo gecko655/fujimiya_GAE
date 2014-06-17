@@ -8,7 +8,14 @@
 
     </cron>
     <cron>
-        <url>/cron/fujimiyaFollow</url>
+        <url>/cron/fujimiyaLunch</url>
+        <description>Fujimiya san</description>
+        <schedule>every day 12:25 </schedule>
+        <timezone>Asia/Tokyo</timezone>
+
+    </cron>
+    <cron>
+        <url>/cron/fujimiyaReply</url>
         <description>Fujimiya san</description>
         <schedule>every 10 mins </schedule>
         <timezone>Asia/Tokyo</timezone>
