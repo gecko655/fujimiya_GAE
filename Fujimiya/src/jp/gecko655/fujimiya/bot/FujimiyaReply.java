@@ -44,6 +44,7 @@ public class FujimiyaReply extends AbstractCron {
                         StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", new URL(getFujimiyaUrl("藤宮さん かわいい")).openStream());
                         update.setInReplyToStatusId(reply.getId());
                         twitter.updateStatus(update);
+                        Thread.sleep(1000*10);//sleep for 10 secs
                         logger.log(Level.INFO,"Successfully replied to "+reply.getUser().getScreenName());
                     }
                 }
@@ -56,6 +57,9 @@ public class FujimiyaReply extends AbstractCron {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
