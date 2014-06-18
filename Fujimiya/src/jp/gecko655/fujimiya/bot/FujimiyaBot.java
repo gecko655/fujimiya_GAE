@@ -20,35 +20,7 @@ import com.google.api.services.customsearch.model.Search;
 
 public class FujimiyaBot extends AbstractCron{
 
-    protected static String getFujimiyaUrl(String query){
-        try{
-            //Get SearchResult
-            Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
-            Customsearch search = builder.build();
-            Customsearch.Cse.List list = search.cse().list(query); //$NON-NLS-1$
-            
-            list.setCx(Messages.getString("FujimiyaBot.cx")); //$NON-NLS-1$
-            list.setKey(Messages.getString("FujimiyaBot.key")); //$NON-NLS-1$
-            list.setSearchType("image"); //$NON-NLS-1$
-            list.setNum(1L);
-            long rand = (long)Math.random()*100;
-            list.setStart(rand);
-            Search results = list.execute();
-            List<Result> items = results.getItems();
-            logger.log(Level.INFO,"query: " + query+" rand :"+rand + " URL: "+items.get(0).getLink());
-            return items.get(0).getLink();
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-}
+
     protected String getTweet(Twitter twitter){
         String tweets[] = {
                 "玉子焼き作ってきたの。", //$NON-NLS-1$

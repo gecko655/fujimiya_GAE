@@ -41,7 +41,8 @@ public class FujimiyaReply extends AbstractCron {
                         twitter.updateStatus(update);
                         logger.log(Level.INFO,"Successfully followed back to "+reply.getUser().getScreenName());
                     }else{
-                        StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()).media("fujimiya.jpg", new URL(FujimiyaBot.getFujimiyaUrl("藤宮さん かわいい")).openStream());
+                    	logger.log(Level.INFO, "READY TO REPLY");
+                        StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", new URL(getFujimiyaUrl("藤宮さんかわいい")).openStream());
                         update.setInReplyToStatusId(reply.getId());
                         twitter.updateStatus(update);
                         logger.log(Level.INFO,"Successfully replied to "+reply.getUser().getScreenName());
