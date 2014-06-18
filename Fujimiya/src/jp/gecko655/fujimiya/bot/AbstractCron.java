@@ -43,7 +43,23 @@ public abstract class AbstractCron extends HttpServlet{
         twitterCron(cb);
     }
 
+    /**
+     * Search fujimiya-san's image and return the url.
+     * The return is randomly picked up from the 100 result of google image search.
+     * @param query
+     * @return
+     */
     protected String getFujimiyaUrl(String query){
+    	return getFujimiyaUrl(query,100);
+    }
+    /**
+     * Search fujimiya-san's image and return the url.
+     * The return is randomly picked up from the maxRankOfResult result of google image search.
+     * @param query
+     * @param maxRankOfResult
+     * @return
+     */
+    protected String getFujimiyaUrl(String query,int maxRankOfResult){
         try{
             //Get SearchResult
             Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
@@ -54,11 +70,9 @@ public abstract class AbstractCron extends HttpServlet{
             list.setKey(Messages.getString("AbstractCron.key")); //$NON-NLS-1$
             list.setSearchType("image"); //$NON-NLS-1$
             list.setNum(1L);
-            long rand = (long)Math.random()*100;
+            long rand = (long)(Math.random()*maxRankOfResult+1);
             list.setStart(rand);
-            logger.log(Level.INFO,"qwer");
             Search results = list.execute();
-            logger.log(Level.INFO,"wer");
             List<Result> items = results.getItems();
             logger.log(Level.INFO,"query: " + query+" rand :"+rand + " URL: "+items.get(0).getLink());
             return items.get(0).getLink();

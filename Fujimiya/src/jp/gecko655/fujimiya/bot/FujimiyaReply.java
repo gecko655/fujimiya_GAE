@@ -41,10 +41,10 @@ public class FujimiyaReply extends AbstractCron {
                         twitter.updateStatus(update);
                         logger.log(Level.INFO,"Successfully followed back to "+reply.getUser().getScreenName());
                     }else{
-                    	logger.log(Level.INFO, "READY TO REPLY");
-                        StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", new URL(getFujimiyaUrl("藤宮さんかわいい")).openStream());
+                        StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", new URL(getFujimiyaUrl("藤宮さん かわいい",25)).openStream());
                         update.setInReplyToStatusId(reply.getId());
                         twitter.updateStatus(update);
+                        Thread.sleep(1000*10);//sleep for 10 secs
                         logger.log(Level.INFO,"Successfully replied to "+reply.getUser().getScreenName());
                     }
                 }
@@ -57,6 +57,9 @@ public class FujimiyaReply extends AbstractCron {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
