@@ -70,6 +70,7 @@ public abstract class AbstractCron extends HttpServlet{
             list.setKey(Messages.getString("AbstractCron.key")); //$NON-NLS-1$
             list.setSearchType("image"); //$NON-NLS-1$
             list.setNum(1L);
+            list.setImgSize("huge").setImgSize("large").setImgSize("medium").setImgSize("xlarge").setImgSize("xxlarge");
             long rand = (long)(Math.random()*maxRankOfResult+1);
             list.setStart(rand);
             Search results = list.execute();
