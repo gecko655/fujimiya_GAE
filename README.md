@@ -25,4 +25,7 @@ Google App Engine上で動作するTwitter Botの制御プログラムです。
 > なお、TwitterAPIのconsumerKeyなどを別ファイルで保存しているため、
 このリポジトリをクローンしてもそのままでは動きません。
 
+Special Thanks: https://twitter.com/nyoro_331/status/475542674838007808
+
 なにかあれば[@gecko655](http://twitter.com/gecko655 "")まで。
+
