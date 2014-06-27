@@ -25,8 +25,8 @@ public class FujimiyaRemove extends AbstractCron {
                 PagableResponseList<User> followers = twitter.getFriendsList(twitter.getId(), cursor);
                 for(User follower: followers){
                     twitter.destroyFriendship(follower.getId());
-                    twitter.updateStatus(new StatusUpdate("@"+follower.getScreenName()+" あなた誰ですか？"));
-                    Thread.sleep(20000L);
+                    twitter.updateStatus(new StatusUpdate("@"+follower.getScreenName()+" あなた、誰？"));
+                    Thread.sleep(111*1000L);
                 }
                 cursor = followers.getNextCursor();
             }
