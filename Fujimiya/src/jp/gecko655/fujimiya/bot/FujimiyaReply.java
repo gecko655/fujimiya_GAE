@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import twitter4j.Relationship;
 import twitter4j.Status;
@@ -27,6 +29,7 @@ public class FujimiyaReply extends AbstractCron {
     protected void twitterCron(ConfigurationBuilder cb) {
         Twitter twitter = new TwitterFactory(cb.build()).getInstance();
         try {
+            Pattern pattern = Pattern.compile("(くん|さん|君|ちゃん)$");
             List<Status> replies = twitter.getMentionsTimeline();
             for(Status reply: replies){
                 Relationship relation = twitter.friendsFollowers().showFriendship(twitter.getId(), reply.getUser().getId());
@@ -35,8 +38,13 @@ public class FujimiyaReply extends AbstractCron {
                 	//10 min 6 sec because gae cron sometimes delays up to 5 secs.
                     if(!relation.isSourceFollowingTarget()){
                     	//follow back
-                        User user =twitter.createFriendship(reply.getUser().getId());
-                        StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+reply.getUser().getName()+"くん？");
+                        twitter.createFriendship(reply.getUser().getId());
+                        String userName = reply.getUser().getName();
+                        if(pattern.matcher(userName).find()){
+                        }else{
+                            userName = userName + "くん";
+                        }
+                        StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+userName+"？");
                         update.setInReplyToStatusId(reply.getId());
                         twitter.updateStatus(update);
                         logger.log(Level.INFO,"Successfully followed back to "+reply.getUser().getScreenName());
