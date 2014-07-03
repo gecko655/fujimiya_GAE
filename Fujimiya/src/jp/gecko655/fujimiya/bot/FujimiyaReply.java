@@ -32,7 +32,7 @@ public class FujimiyaReply extends AbstractCron {
         try {
             Pattern pattern = Pattern.compile("(くん|さん|君|ちゃん)$");
             Date now = new Date();
-            List<Status> replies = twitter.getMentionsTimeline((new Paging()).count(200));
+            List<Status> replies = twitter.getMentionsTimeline((new Paging()).count(60));
             for(Status reply: replies){
                 Relationship relation = twitter.friendsFollowers().showFriendship(twitter.getId(), reply.getUser().getId());
                 if((now.getTime() - reply.getCreatedAt().getTime())<1000*60*10+1000*6){
@@ -61,16 +61,16 @@ public class FujimiyaReply extends AbstractCron {
             }
 
         } catch (TwitterException e) {
-            // TODO Auto-generated catch block
+            logger.log(Level.WARNING,e.toString());
             e.printStackTrace();
         } catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
+            logger.log(Level.WARNING,e.toString());
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+            logger.log(Level.WARNING,e.toString());
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+            logger.log(Level.WARNING,e.toString());
 			e.printStackTrace();
 		}
 
