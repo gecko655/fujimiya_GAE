@@ -32,34 +32,35 @@ public class FujimiyaReply extends AbstractCron {
         try {
             Pattern pattern = Pattern.compile("(くん|さん|君|ちゃん)$");
             Date now = new Date();
-            List<Status> replies = twitter.getMentionsTimeline((new Paging()).count(60));
+            List<Status> replies = twitter.getMentionsTimeline((new Paging()).count(20));
             for(Status reply: replies){
                 Relationship relation = twitter.friendsFollowers().showFriendship(twitter.getId(), reply.getUser().getId());
-                if((now.getTime() - reply.getCreatedAt().getTime())<1000*60*10+1000*6){
-                	//10 min 6 sec because gae cron sometimes delays up to 5 secs.
-                    if(!relation.isSourceFollowingTarget()){
-                    	//follow back
-                        twitter.createFriendship(reply.getUser().getId());
-                        String userName = reply.getUser().getName();
-                        if(pattern.matcher(userName).find()){
-                        }else{
-                            userName = userName + "くん";
-                        }
-                        StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+userName+"？");
-                        update.setInReplyToStatusId(reply.getId());
-                        twitter.updateStatus(update);
-                        logger.log(Level.INFO,"Successfully followed back to "+reply.getUser().getScreenName());
-                    }else{
-                    	//auto reply (when fujimiya-san follows the replier)
-                        StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", new URL(getFujimiyaUrl("藤宮香織 かわいい 一週間フレンズ。",100)).openStream());
-                        update.setInReplyToStatusId(reply.getId());
-                        twitter.updateStatus(update);
-                        logger.log(Level.INFO,"Successfully replied to "+reply.getUser().getScreenName());
-                    }
-                    Thread.sleep(1000*10);//sleep for 10 secs
+                if((now.getTime() - reply.getCreatedAt().getTime())>1000*60*5+1000*6){
+                    logger.log(Level.INFO, reply.getUser().getName()+"'s tweet is out of date");
+                    return;
                 }
+                //10 min 6 sec because gae cron sometimes delays up to 5 secs.
+                if(!relation.isSourceFollowingTarget()){
+                    //follow back
+                    twitter.createFriendship(reply.getUser().getId());
+                    String userName = reply.getUser().getName();
+                    if(pattern.matcher(userName).find()){
+                    }else{
+                        userName = userName + "くん";
+                    }
+                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+userName+"？");
+                    update.setInReplyToStatusId(reply.getId());
+                    twitter.updateStatus(update);
+                    logger.log(Level.INFO,"Successfully followed back to "+reply.getUser().getScreenName());
+                }else{
+                    //auto reply (when fujimiya-san follows the replier)
+                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", new URL(getFujimiyaUrl("藤宮香織 かわいい 一週間フレンズ。",100)).openStream());
+                    update.setInReplyToStatusId(reply.getId());
+                    twitter.updateStatus(update);
+                    logger.log(Level.INFO,"Successfully replied to "+reply.getUser().getScreenName());
+                }
+                Thread.sleep(1000*10);//sleep for 10 secs
             }
-
         } catch (TwitterException e) {
             logger.log(Level.WARNING,e.toString());
             e.printStackTrace();

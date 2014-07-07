@@ -17,7 +17,7 @@
     <cron>
         <url>/cron/fujimiyaReply</url>
         <description>Fujimiya san</description>
-        <schedule>every 10 mins </schedule>
+        <schedule>every 5 mins </schedule>
         <timezone>Asia/Tokyo</timezone>
 
     </cron>
