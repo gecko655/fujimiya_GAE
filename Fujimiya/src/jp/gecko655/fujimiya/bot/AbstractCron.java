@@ -75,8 +75,10 @@ public abstract class AbstractCron extends HttpServlet{
             list.setStart(rand);
             Search results = list.execute();
             List<Result> items = results.getItems();
-            logger.log(Level.INFO,"query: " + query+" rand :"+rand + " URL: "+items.get(0).getLink());
-            return items.get(0).getLink();
+            Result result = items.get(0);
+            logger.log(Level.INFO,"query: " + query+" rand :"+rand + " URL: "+result.getLink());
+            logger.log(Level.INFO,"page URL: "+result.getImage().getContextLink());
+            return result.getLink();
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
