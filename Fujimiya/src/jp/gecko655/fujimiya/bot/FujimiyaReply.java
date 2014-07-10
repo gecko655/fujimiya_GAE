@@ -34,11 +34,11 @@ public class FujimiyaReply extends AbstractCron {
             Date now = new Date();
             List<Status> replies = twitter.getMentionsTimeline((new Paging()).count(20));
             for(Status reply: replies){
-                Relationship relation = twitter.friendsFollowers().showFriendship(twitter.getId(), reply.getUser().getId());
                 if((now.getTime() - reply.getCreatedAt().getTime())>1000*60*5+1000*6){
                     logger.log(Level.INFO, reply.getUser().getName()+"'s tweet is out of date");
                     return;
                 }
+                Relationship relation = twitter.friendsFollowers().showFriendship(twitter.getId(), reply.getUser().getId());
                 //10 min 6 sec because gae cron sometimes delays up to 5 secs.
                 if(!relation.isSourceFollowingTarget()){
                     //follow back
