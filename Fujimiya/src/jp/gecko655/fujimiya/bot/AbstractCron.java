@@ -1,7 +1,11 @@
 package jp.gecko655.fujimiya.bot;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +53,7 @@ public abstract class AbstractCron extends HttpServlet{
      * @param query
      * @return
      */
-    protected String getFujimiyaUrl(String query){
+    protected InputStream getFujimiyaUrl(String query){
     	return getFujimiyaUrl(query,100);
     }
     /**
@@ -59,7 +63,7 @@ public abstract class AbstractCron extends HttpServlet{
      * @param maxRankOfResult
      * @return
      */
-    protected String getFujimiyaUrl(String query,int maxRankOfResult){
+    protected InputStream getFujimiyaUrl(String query,int maxRankOfResult){
         try{
             //Get SearchResult
             Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
@@ -69,16 +73,23 @@ public abstract class AbstractCron extends HttpServlet{
             list.setCx(Messages.getString("AbstractCron.cx")); //$NON-NLS-1$
             list.setKey(Messages.getString("AbstractCron.key")); //$NON-NLS-1$
             list.setSearchType("image"); //$NON-NLS-1$
-            list.setNum(1L);
+            list.setNum(10L);
             list.setImgSize("huge").setImgSize("large").setImgSize("medium").setImgSize("xlarge").setImgSize("xxlarge");
             long rand = (long)(Math.random()*maxRankOfResult+1);
             list.setStart(rand);
             Search results = list.execute();
             List<Result> items = results.getItems();
-            Result result = items.get(0);
-            logger.log(Level.INFO,"query: " + query+" rand :"+rand + " URL: "+result.getLink());
-            logger.log(Level.INFO,"page URL: "+result.getImage().getContextLink());
-            return result.getLink();
+            HttpURLConnection connection = null;
+            for(int i=0;(connection==null||connection.getResponseCode()!=200)&&i<10;i++){
+                Result result = items.get(i);
+                logger.log(Level.INFO,"query: " + query+" rand :"+(rand+1) + " URL: "+result.getLink());
+                logger.log(Level.INFO,"page URL: "+result.getImage().getContextLink());
+                connection = (HttpURLConnection)(new URL(result.getLink())).openConnection();
+                connection.setRequestMethod("GET");
+                connection.setInstanceFollowRedirects(false);
+                connection.connect();
+            }
+            return connection.getInputStream();
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
