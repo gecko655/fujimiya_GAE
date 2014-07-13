@@ -60,7 +60,7 @@ public class FujimiyaReply extends AbstractCron {
                     logger.log(Level.INFO,"Successfully followed back to "+reply.getUser().getScreenName());
                 }else{
                     //auto reply (when fujimiya-san follows the replier)
-                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", new URL(getFujimiyaUrl("藤宮香織 かわいい 一週間フレンズ。",100)).openStream());
+                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", getFujimiyaUrl("藤宮香織 かわいい 一週間フレンズ。",100));
                     update.setInReplyToStatusId(reply.getId());
                     twitter.updateStatus(update);
                     logger.log(Level.INFO,"Successfully replied to "+reply.getUser().getScreenName());
@@ -70,12 +70,6 @@ public class FujimiyaReply extends AbstractCron {
         } catch (TwitterException e) {
             logger.log(Level.WARNING,e.toString());
             e.printStackTrace();
-        } catch (MalformedURLException e) {
-            logger.log(Level.WARNING,e.toString());
-			e.printStackTrace();
-		} catch (IOException e) {
-            logger.log(Level.WARNING,e.toString());
-			e.printStackTrace();
 		} catch (InterruptedException e) {
             logger.log(Level.WARNING,e.toString());
 			e.printStackTrace();

@@ -38,21 +38,15 @@ public class FujimiyaBot extends AbstractCron{
             //Twitterに書き出し
            // twitter.updateStatus(message);
             StatusUpdate status =new StatusUpdate(" "); //$NON-NLS-1$
-            if(((int) (Math.random()*10))==1){
-                status.media("fujimiya.jpg", new URL(getFujimiyaUrl("山岸さん 一週間フレンズ。",30)).openStream()); //$NON-NLS-1$
+            if(((int) (Math.random()*10))==1){//10%
+                status.media("fujimiya.jpg", getFujimiyaUrl("山岸さん 一週間フレンズ。",30)); //$NON-NLS-1$
             }else{
-                status.media("fujimiya.jpg", new URL(getFujimiyaUrl("藤宮さん 一週間フレンズ。")).openStream()); //$NON-NLS-1$
+                status.media("fujimiya.jpg", getFujimiyaUrl("藤宮さん 一週間フレンズ。")); //$NON-NLS-1$
             }
             twitter.updateStatus(status);
             logger.log(Level.INFO, "Successfully tweeted"); //$NON-NLS-1$
         } catch (TwitterException e) {
             logger.log(Level.SEVERE, "Twitter error", e); //$NON-NLS-1$
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
         
     }
