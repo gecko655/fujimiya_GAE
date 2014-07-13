@@ -92,12 +92,15 @@ public abstract class AbstractCron extends HttpServlet{
             return connection.getInputStream();
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
+            logger.log(Level.SEVERE,e.toString());
             e.printStackTrace();
         } catch (IOException e) {
             // TODO Auto-generated catch block
+            logger.log(Level.SEVERE,e.toString());
             e.printStackTrace();
         } catch (Exception e) {
             // TODO Auto-generated catch block
+            logger.log(Level.SEVERE,e.toString());
             e.printStackTrace();
         }
         return null;
