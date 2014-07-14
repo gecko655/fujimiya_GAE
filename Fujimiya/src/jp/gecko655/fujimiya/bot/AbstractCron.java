@@ -64,8 +64,10 @@ public abstract class AbstractCron extends HttpServlet{
      * @return
      */
     protected InputStream getFujimiyaUrl(String query,int maxRankOfResult){
-        query = "藤宮さん 7月14日";
-        maxRankOfResult = 1;
+        if(Math.random()<0.5){
+            query = "藤宮さん 7月14日";
+            maxRankOfResult = 1;
+        }
         try{
             //Get SearchResult
             Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
