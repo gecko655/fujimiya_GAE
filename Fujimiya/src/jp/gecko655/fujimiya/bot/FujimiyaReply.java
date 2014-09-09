@@ -1,5 +1,6 @@
 package jp.gecko655.fujimiya.bot;
 
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,6 +15,9 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
+
 import twitter4j.Paging;
 import twitter4j.Relationship;
 import twitter4j.Status;
@@ -25,27 +29,32 @@ import twitter4j.User;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class FujimiyaReply extends AbstractCron {
+    
+    static final String KEY = "LastTimeStatus";
+    static final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
 
     public FujimiyaReply() {
-        // TODO Auto-generated constructor stub
+        format.setTimeZone(TimeZone.getDefault());
     }
 
     @Override
     protected void twitterCron(ConfigurationBuilder cb) {
         Twitter twitter = new TwitterFactory(cb.build()).getInstance();
+        MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
         try {
             Pattern pattern = Pattern.compile("(くん|さん|君|ちゃん)$");
-            DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-            format.setTimeZone(TimeZone.getDefault());
-            Date now = new Date();
+            Status lastStatus = (Status)memcache.get(KEY);
             List<Status> replies = twitter.getMentionsTimeline((new Paging()).count(20));
+            memcache.put(KEY, replies.get(0));
             for(Status reply: replies){
-                if((now.getTime() - reply.getCreatedAt().getTime())>1000*60*5+1000*6){
+                if(lastStatus == null){
+                    logger.log(Level.INFO,"memcache saved"+reply.getUser().getName()+"'s tweet at "+format.format(reply.getCreatedAt()));
+                    return;
+                }else if(reply.getCreatedAt().getTime()-lastStatus.getCreatedAt().getTime()<=0){
                     logger.log(Level.INFO, reply.getUser().getName()+"'s tweet at "+format.format(reply.getCreatedAt()) +" is out of date");
                     return;
                 }
                 Relationship relation = twitter.friendsFollowers().showFriendship(twitter.getId(), reply.getUser().getId());
-                //10 min 6 sec because gae cron sometimes delays up to 5 secs.
                 if(!relation.isSourceFollowingTarget()){
                     //follow back
                     twitter.createFriendship(reply.getUser().getId());
