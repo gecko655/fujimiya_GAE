@@ -32,16 +32,10 @@ public class FujimiyaLunch extends AbstractCron{
     @Override
     protected void twitterCron() {
         //String message = getTweet(twitter);
-        try {
-            //Twitterに書き出し
-           // twitter.updateStatus(message);
-            StatusUpdate status =new StatusUpdate(" "); //$NON-NLS-1$
-            status.media("fujimiya.jpg", getFujimiyaUrl("藤宮さん 昼",10));//$NON-NLS-1$
-            twitter.updateStatus(status);
-            logger.log(Level.INFO, "Successfully tweeted"); //$NON-NLS-1$
-        } catch (TwitterException e) {
-            logger.log(Level.SEVERE, "Twitter error", e); //$NON-NLS-1$
-        }
+        //Twitterに書き出し
+        // twitter.updateStatus(message);
+        StatusUpdate status =new StatusUpdate(" "); //$NON-NLS-1$
+        updateStatusWithMedia(status, "藤宮さん 昼", 10);//$NON-NLS-1$
         
     }
 

@@ -129,7 +129,7 @@ public abstract class AbstractCron extends HttpServlet{
                         try{
                             update.media("fujimiya.jpg",getFujimiyaUrl(query,maxRankOfResult));
                             succeededStatus = twitter.updateStatus(update);
-                            logger.log(Level.INFO,"Successfully tweeted "+succeededStatus.getText());
+                            logger.log(Level.INFO,"Successfully tweeted: "+succeededStatus.getText());
                         }catch(TwitterException e){
                             logger.log(Level.INFO,"updateStatusWithMedia failed. try again. "+ e.getErrorMessage());
                         }
