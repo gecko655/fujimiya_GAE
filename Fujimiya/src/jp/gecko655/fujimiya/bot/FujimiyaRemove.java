@@ -17,8 +17,7 @@ public class FujimiyaRemove extends AbstractCron {
     }
 
     @Override
-    protected void twitterCron(ConfigurationBuilder cb) {
-        Twitter twitter = new TwitterFactory(cb.build()).getInstance();
+    protected void twitterCron() {
         try {
             long cursor = -1L;
             int friendsCount= twitter.verifyCredentials().getFriendsCount();

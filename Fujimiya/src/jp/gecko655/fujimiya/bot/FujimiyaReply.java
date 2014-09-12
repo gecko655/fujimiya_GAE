@@ -38,8 +38,7 @@ public class FujimiyaReply extends AbstractCron {
     }
 
     @Override
-    protected void twitterCron(ConfigurationBuilder cb) {
-        Twitter twitter = new TwitterFactory(cb.build()).getInstance();
+    protected void twitterCron() {
         MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
         try {
             Pattern pattern = Pattern.compile("(くん|さん|君|ちゃん)$");
@@ -68,17 +67,9 @@ public class FujimiyaReply extends AbstractCron {
                 }else{
                     //auto reply (when fujimiya-san follows the replier)
                     
-                    Status succeededStatus = null;
-                    while(succeededStatus==null){
-                        try{
-                            StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", getFujimiyaUrl("藤宮香織 かわいい 一週間フレンズ。",100));
-                            update.setInReplyToStatusId(reply.getId());
-                            succeededStatus = twitter.updateStatus(update);
-                            logger.log(Level.INFO,"Successfully replied to "+reply.getUser().getScreenName());
-                        }catch(TwitterException e){
-                            logger.log(Level.INFO,"Reply failed. try again. "+ e.getErrorMessage());
-                        }
-                    }
+                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ");
+                    update.setInReplyToStatusId(reply.getId());
+                    updateStatusWithMedia(update, "藤宮香織 かわいい 一週間フレンズ。",100);
                 }
                 Thread.sleep(1000*10);//sleep for 10 secs
             }

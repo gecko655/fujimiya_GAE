@@ -31,8 +31,7 @@ public class FujimiyaBot extends AbstractCron{
     }
     
     @Override
-    protected void twitterCron(ConfigurationBuilder cb) {
-        Twitter twitter = new TwitterFactory(cb.build()).getInstance();
+    protected void twitterCron() {
         //String message = getTweet(twitter);
         try {
             //Twitterに書き出し

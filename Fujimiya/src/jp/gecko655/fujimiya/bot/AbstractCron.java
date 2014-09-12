@@ -20,6 +20,11 @@ import com.google.api.services.customsearch.Customsearch;
 import com.google.api.services.customsearch.model.Result;
 import com.google.api.services.customsearch.model.Search;
 
+import twitter4j.Status;
+import twitter4j.StatusUpdate;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
 public abstract class AbstractCron extends HttpServlet{
@@ -31,6 +36,7 @@ public abstract class AbstractCron extends HttpServlet{
     static String accessToken = Messages.getString("AbstractCron.accessToken"); //$NON-NLS-1$
     static String accessTokenSecret = Messages.getString("AbstractCron.accessTokenSecret"); //$NON-NLS-1$
 
+    static Twitter twitter;
     static Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
     static Customsearch search = builder.build();
     
@@ -47,7 +53,8 @@ public abstract class AbstractCron extends HttpServlet{
             .setOAuthAccessTokenSecret(accessTokenSecret)
             .setOAuthConsumerKey(consumerKey)
             .setOAuthConsumerSecret(consumerSecret);
-        twitterCron(cb);
+        twitter = new TwitterFactory(cb.build()).getInstance();
+        twitterCron();
     }
 
     /**
@@ -116,7 +123,21 @@ public abstract class AbstractCron extends HttpServlet{
         return null;
 }
     
-    abstract protected void twitterCron(ConfigurationBuilder cb);
+    protected void updateStatusWithMedia(StatusUpdate update, String query, int maxRankOfResult){
+                    Status succeededStatus = null;
+                    while(succeededStatus==null){
+                        try{
+                            update.media("fujimiya.jpg",getFujimiyaUrl(query,maxRankOfResult));
+                            succeededStatus = twitter.updateStatus(update);
+                            logger.log(Level.INFO,"Successfully tweeted "+succeededStatus.getText());
+                        }catch(TwitterException e){
+                            logger.log(Level.INFO,"updateStatusWithMedia failed. try again. "+ e.getErrorMessage());
+                        }
+                    }
+        
+    }
+    
+    abstract protected void twitterCron();
 
 
 }
