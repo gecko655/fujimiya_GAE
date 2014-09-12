@@ -1,22 +1,7 @@
 package jp.gecko655.fujimiya.bot;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.logging.Level;
-
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.ConfigurationBuilder;
-
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.customsearch.Customsearch;
-import com.google.api.services.customsearch.model.Result;
-import com.google.api.services.customsearch.model.Search;
 
 public class FujimiyaLunch extends AbstractCron{
 
@@ -30,19 +15,12 @@ public class FujimiyaLunch extends AbstractCron{
     }
     
     @Override
-    protected void twitterCron(ConfigurationBuilder cb) {
-        Twitter twitter = new TwitterFactory(cb.build()).getInstance();
+    protected void twitterCron() {
         //String message = getTweet(twitter);
-        try {
-            //Twitterに書き出し
-           // twitter.updateStatus(message);
-            StatusUpdate status =new StatusUpdate(" "); //$NON-NLS-1$
-            status.media("fujimiya.jpg", getFujimiyaUrl("藤宮さん 昼",10));//$NON-NLS-1$
-            twitter.updateStatus(status);
-            logger.log(Level.INFO, "Successfully tweeted"); //$NON-NLS-1$
-        } catch (TwitterException e) {
-            logger.log(Level.SEVERE, "Twitter error", e); //$NON-NLS-1$
-        }
+        //Twitterに書き出し
+        // twitter.updateStatus(message);
+        StatusUpdate status =new StatusUpdate(" "); //$NON-NLS-1$
+        updateStatusWithMedia(status, "藤宮さん 昼", 10);//$NON-NLS-1$
         
     }
 

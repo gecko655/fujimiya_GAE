@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,13 +13,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import twitter4j.Status;
+import twitter4j.StatusUpdate;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
+
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.customsearch.Customsearch;
 import com.google.api.services.customsearch.model.Result;
 import com.google.api.services.customsearch.model.Search;
-
-import twitter4j.conf.ConfigurationBuilder;
 
 public abstract class AbstractCron extends HttpServlet{
 
@@ -30,6 +34,10 @@ public abstract class AbstractCron extends HttpServlet{
     static String consumerSecret = Messages.getString("AbstractCron.consumerSecret"); //$NON-NLS-1$
     static String accessToken = Messages.getString("AbstractCron.accessToken"); //$NON-NLS-1$
     static String accessTokenSecret = Messages.getString("AbstractCron.accessTokenSecret"); //$NON-NLS-1$
+
+    static Twitter twitter;
+    static Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
+    static Customsearch search = builder.build();
     
     public AbstractCron() {
         logger.setLevel(Level.FINE);
@@ -44,7 +52,8 @@ public abstract class AbstractCron extends HttpServlet{
             .setOAuthAccessTokenSecret(accessTokenSecret)
             .setOAuthConsumerKey(consumerKey)
             .setOAuthConsumerSecret(consumerSecret);
-        twitterCron(cb);
+        twitter = new TwitterFactory(cb.build()).getInstance();
+        twitterCron();
     }
 
     /**
@@ -66,8 +75,6 @@ public abstract class AbstractCron extends HttpServlet{
     protected InputStream getFujimiyaUrl(String query,int maxRankOfResult){
         try{
             //Get SearchResult
-            Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
-            Customsearch search = builder.build();
             Customsearch.Cse.List list = search.cse().list(query); //$NON-NLS-1$
             
             list.setCx(Messages.getString("AbstractCron.cx")); //$NON-NLS-1$
@@ -75,21 +82,30 @@ public abstract class AbstractCron extends HttpServlet{
             list.setSearchType("image"); //$NON-NLS-1$
             list.setNum(10L);
             list.setImgSize("huge").setImgSize("large").setImgSize("medium").setImgSize("xlarge").setImgSize("xxlarge");
-            long rand = (long)(Math.random()*maxRankOfResult+1);
-            list.setStart(rand);
-            Search results = list.execute();
+            Search results = null;
+            while(results==null){
+                try{
+                    long rand = (long)(Math.random()*maxRankOfResult+1);
+                    list.setStart(rand);
+                    logger.log(Level.INFO,"rand: "+rand);
+                    results = list.execute();
+                }catch(IOException e){
+                }
+            }
             List<Result> items = results.getItems();
             HttpURLConnection connection = null;
             for(int i=0;(connection==null||connection.getResponseCode()!=200)&&i<10;i++){
                 Result result = items.get(i);
-                logger.log(Level.INFO,"query: " + query+" rand :"+(rand+1) + " URL: "+result.getLink());
+                logger.log(Level.INFO,"query: " + query + " URL: "+result.getLink());
                 logger.log(Level.INFO,"page URL: "+result.getImage().getContextLink());
                 connection = (HttpURLConnection)(new URL(result.getLink())).openConnection();
                 connection.setRequestMethod("GET");
                 connection.setInstanceFollowRedirects(false);
                 connection.connect();
             }
-            return connection.getInputStream();
+            InputStream in = connection.getInputStream();
+
+            return in;
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             logger.log(Level.SEVERE,e.toString());
@@ -106,7 +122,21 @@ public abstract class AbstractCron extends HttpServlet{
         return null;
 }
     
-    abstract protected void twitterCron(ConfigurationBuilder cb);
+    protected void updateStatusWithMedia(StatusUpdate update, String query, int maxRankOfResult){
+                    Status succeededStatus = null;
+                    while(succeededStatus==null){
+                        try{
+                            update.media("fujimiya.jpg",getFujimiyaUrl(query,maxRankOfResult));
+                            succeededStatus = twitter.updateStatus(update);
+                            logger.log(Level.INFO,"Successfully tweeted: "+succeededStatus.getText());
+                        }catch(TwitterException e){
+                            logger.log(Level.INFO,"updateStatusWithMedia failed. try again. "+ e.getErrorMessage());
+                        }
+                    }
+        
+    }
+    
+    abstract protected void twitterCron();
 
 
 }

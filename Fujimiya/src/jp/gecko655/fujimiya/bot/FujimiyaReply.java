@@ -1,32 +1,20 @@
 package jp.gecko655.fujimiya.bot;
 
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
 import twitter4j.Paging;
 import twitter4j.Relationship;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
-import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.User;
-import twitter4j.conf.ConfigurationBuilder;
+
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
 public class FujimiyaReply extends AbstractCron {
     
@@ -38,8 +26,7 @@ public class FujimiyaReply extends AbstractCron {
     }
 
     @Override
-    protected void twitterCron(ConfigurationBuilder cb) {
-        Twitter twitter = new TwitterFactory(cb.build()).getInstance();
+    protected void twitterCron() {
         MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
         try {
             Pattern pattern = Pattern.compile("(くん|さん|君|ちゃん)$");
@@ -65,23 +52,17 @@ public class FujimiyaReply extends AbstractCron {
                     }
                     StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+userName+"？");
                     update.setInReplyToStatusId(reply.getId());
-                    twitter.updateStatus(update);
-                    logger.log(Level.INFO,"Successfully followed back to "+reply.getUser().getScreenName());
                 }else{
                     //auto reply (when fujimiya-san follows the replier)
-                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", getFujimiyaUrl("藤宮香織 かわいい 一週間フレンズ。",100));
+                    
+                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ");
                     update.setInReplyToStatusId(reply.getId());
-                    twitter.updateStatus(update);
-                    logger.log(Level.INFO,"Successfully replied to "+reply.getUser().getScreenName());
+                    updateStatusWithMedia(update, "藤宮香織 かわいい 一週間フレンズ。",100);
                 }
-                Thread.sleep(1000*10);//sleep for 10 secs
             }
         } catch (TwitterException e) {
             logger.log(Level.WARNING,e.toString());
             e.printStackTrace();
-		} catch (InterruptedException e) {
-            logger.log(Level.WARNING,e.toString());
-			e.printStackTrace();
 		}
 
 

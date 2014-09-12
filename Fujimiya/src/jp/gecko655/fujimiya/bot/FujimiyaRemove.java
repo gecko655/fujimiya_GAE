@@ -1,14 +1,9 @@
 package jp.gecko655.fujimiya.bot;
 
-import java.util.List;
-
 import twitter4j.PagableResponseList;
 import twitter4j.StatusUpdate;
-import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
 import twitter4j.User;
-import twitter4j.conf.ConfigurationBuilder;
 
 public class FujimiyaRemove extends AbstractCron {
 
@@ -17,8 +12,7 @@ public class FujimiyaRemove extends AbstractCron {
     }
 
     @Override
-    protected void twitterCron(ConfigurationBuilder cb) {
-        Twitter twitter = new TwitterFactory(cb.build()).getInstance();
+    protected void twitterCron() {
         try {
             long cursor = -1L;
             int friendsCount= twitter.verifyCredentials().getFriendsCount();
