@@ -65,14 +65,20 @@ public class FujimiyaReply extends AbstractCron {
                     }
                     StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+userName+"？");
                     update.setInReplyToStatusId(reply.getId());
-                    twitter.updateStatus(update);
-                    logger.log(Level.INFO,"Successfully followed back to "+reply.getUser().getScreenName());
                 }else{
                     //auto reply (when fujimiya-san follows the replier)
-                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", getFujimiyaUrl("藤宮香織 かわいい 一週間フレンズ。",100));
-                    update.setInReplyToStatusId(reply.getId());
-                    twitter.updateStatus(update);
-                    logger.log(Level.INFO,"Successfully replied to "+reply.getUser().getScreenName());
+                    
+                    Status succeededStatus = null;
+                    while(succeededStatus==null){
+                        try{
+                            StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ").media("fujimiya.jpg", getFujimiyaUrl("藤宮香織 かわいい 一週間フレンズ。",100));
+                            update.setInReplyToStatusId(reply.getId());
+                            succeededStatus = twitter.updateStatus(update);
+                            logger.log(Level.INFO,"Successfully replied to "+reply.getUser().getScreenName());
+                        }catch(TwitterException e){
+                            logger.log(Level.INFO,"Reply failed. try again. "+ e.getErrorMessage());
+                        }
+                    }
                 }
                 Thread.sleep(1000*10);//sleep for 10 secs
             }

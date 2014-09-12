@@ -75,21 +75,30 @@ public abstract class AbstractCron extends HttpServlet{
             list.setSearchType("image"); //$NON-NLS-1$
             list.setNum(10L);
             list.setImgSize("huge").setImgSize("large").setImgSize("medium").setImgSize("xlarge").setImgSize("xxlarge");
-            long rand = (long)(Math.random()*maxRankOfResult+1);
-            list.setStart(rand);
-            Search results = list.execute();
+            Search results = null;
+            while(results==null){
+                try{
+                    long rand = (long)(Math.random()*maxRankOfResult+1);
+                    list.setStart(rand);
+                    logger.log(Level.INFO,"rand: "+rand);
+                    results = list.execute();
+                }catch(IOException e){
+                }
+            }
             List<Result> items = results.getItems();
             HttpURLConnection connection = null;
             for(int i=0;(connection==null||connection.getResponseCode()!=200)&&i<10;i++){
                 Result result = items.get(i);
-                logger.log(Level.INFO,"query: " + query+" rand :"+(rand+1) + " URL: "+result.getLink());
+                logger.log(Level.INFO,"query: " + query + " URL: "+result.getLink());
                 logger.log(Level.INFO,"page URL: "+result.getImage().getContextLink());
                 connection = (HttpURLConnection)(new URL(result.getLink())).openConnection();
                 connection.setRequestMethod("GET");
                 connection.setInstanceFollowRedirects(false);
                 connection.connect();
             }
-            return connection.getInputStream();
+            InputStream in = connection.getInputStream();
+
+            return in;
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             logger.log(Level.SEVERE,e.toString());
