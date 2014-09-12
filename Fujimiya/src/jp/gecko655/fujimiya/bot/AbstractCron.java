@@ -30,6 +30,9 @@ public abstract class AbstractCron extends HttpServlet{
     static String consumerSecret = Messages.getString("AbstractCron.consumerSecret"); //$NON-NLS-1$
     static String accessToken = Messages.getString("AbstractCron.accessToken"); //$NON-NLS-1$
     static String accessTokenSecret = Messages.getString("AbstractCron.accessTokenSecret"); //$NON-NLS-1$
+
+    static Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
+    static Customsearch search = builder.build();
     
     public AbstractCron() {
         logger.setLevel(Level.FINE);
@@ -66,8 +69,6 @@ public abstract class AbstractCron extends HttpServlet{
     protected InputStream getFujimiyaUrl(String query,int maxRankOfResult){
         try{
             //Get SearchResult
-            Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
-            Customsearch search = builder.build();
             Customsearch.Cse.List list = search.cse().list(query); //$NON-NLS-1$
             
             list.setCx(Messages.getString("AbstractCron.cx")); //$NON-NLS-1$
