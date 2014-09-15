@@ -52,6 +52,7 @@ public class FujimiyaReply extends AbstractCron {
                     }
                     StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+userName+"？");
                     update.setInReplyToStatusId(reply.getId());
+                    twitter.updateStatus(update);
                 }else{
                     //auto reply (when fujimiya-san follows the replier)
                     
