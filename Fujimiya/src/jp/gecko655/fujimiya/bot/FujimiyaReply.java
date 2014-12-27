@@ -13,6 +13,9 @@ import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.TwitterException;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
@@ -25,7 +28,7 @@ public class FujimiyaReply extends AbstractCron {
     static final String KEY = "LastTimeStatus";
     static final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
     private static final Pattern keishouPattern = Pattern.compile("(くん|さん|君|ちゃん)$");
-    private static final Pattern whoPattern = Pattern.compile("(誰だ[^と]|だれだ[^と])");
+    private static final Pattern whoPattern = Pattern.compile("(誰[^でだ]|だれ[^でだ]|誰だ[^と]|だれだ[^と])");
 
     public FujimiyaReply() {
         format.setTimeZone(TimeZone.getDefault());
@@ -50,7 +53,12 @@ public class FujimiyaReply extends AbstractCron {
                 if(!relation.isSourceFollowingTarget()){
                     followBack(reply);
                 }else if(whoPattern.matcher(reply.getText()).find()){
-                    //TODO make black list.
+                    String tweet = twitter.showStatus(reply.getInReplyToStatusId()).getText();
+                    String url = tweet.substring(tweet.indexOf("http"));
+                    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+                    Entity notFujimiya = new Entity("NotFujimiya");
+                    notFujimiya.setProperty(url, "");
+                    ds.put(notFujimiya);
                 }else{
                     //auto reply (when fujimiya-san follows the replier)
                     
