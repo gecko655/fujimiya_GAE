@@ -2,6 +2,7 @@ package jp.gecko655.fujimiya.bot;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,6 +28,11 @@ import com.google.api.services.customsearch.model.Result;
 import com.google.api.services.customsearch.model.Search;
 
 public abstract class AbstractCron extends HttpServlet{
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     static Logger logger = Logger.getLogger("Fujimiya"); //$NON-NLS-1$
     
@@ -75,37 +81,25 @@ public abstract class AbstractCron extends HttpServlet{
     protected InputStream getFujimiyaUrl(String query,int maxRankOfResult){
         try{
             //Get SearchResult
-            Customsearch.Cse.List list = search.cse().list(query); //$NON-NLS-1$
-            
-            list.setCx(Messages.getString("AbstractCron.cx")); //$NON-NLS-1$
-            list.setKey(Messages.getString("AbstractCron.key")); //$NON-NLS-1$
-            list.setSearchType("image"); //$NON-NLS-1$
-            list.setNum(10L);
-            list.setImgSize("huge").setImgSize("large").setImgSize("medium").setImgSize("xlarge").setImgSize("xxlarge");
-            Search results = null;
-            while(results==null){
-                try{
-                    long rand = (long)(Math.random()*maxRankOfResult+1);
-                    list.setStart(rand);
-                    logger.log(Level.INFO,"rand: "+rand);
-                    results = list.execute();
-                }catch(IOException e){
-                }
-            }
-            List<Result> items = results.getItems();
-            HttpURLConnection connection = null;
-            for(int i=0;(connection==null||connection.getResponseCode()!=200)&&i<10;i++){
+            Search search = getSearchResult(query, maxRankOfResult);
+            List<Result> items = search.getItems();
+            for(int i=0;i<10;i++){
                 Result result = items.get(i);
                 logger.log(Level.INFO,"query: " + query + " URL: "+result.getLink());
                 logger.log(Level.INFO,"page URL: "+result.getImage().getContextLink());
-                connection = (HttpURLConnection)(new URL(result.getLink())).openConnection();
+                HttpURLConnection connection = (HttpURLConnection)(new URL(result.getLink())).openConnection();
                 connection.setRequestMethod("GET");
                 connection.setInstanceFollowRedirects(false);
                 connection.connect();
+                if(connection.getResponseCode()==200){
+                    return connection.getInputStream();
+                }else{
+                    //retry.
+                }
             }
-            InputStream in = connection.getInputStream();
+            //If execution comes here, connection has failed 10 times.
+            throw new ConnectException();
 
-            return in;
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             logger.log(Level.SEVERE,e.toString());
@@ -122,6 +116,30 @@ public abstract class AbstractCron extends HttpServlet{
         return null;
 }
     
+    private Search getSearchResult(String query, int maxRankOfResult) throws IOException {
+            Customsearch.Cse.List list = search.cse().list(query); //$NON-NLS-1$
+            
+            list.setCx(Messages.getString("AbstractCron.cx")); //$NON-NLS-1$
+            list.setKey(Messages.getString("AbstractCron.key")); //$NON-NLS-1$
+            list.setSearchType("image"); //$NON-NLS-1$
+            list.setNum(10L);
+            list.setImgSize("huge").setImgSize("large").setImgSize("medium").setImgSize("xlarge").setImgSize("xxlarge");
+            Search results = null;
+            while(true){
+                try{
+                    long rand = (long)(Math.random()*maxRankOfResult+1);
+                    list.setStart(rand);
+                    logger.log(Level.INFO,"rand: "+rand);
+                    results = list.execute();
+                    if(results != null){
+                        return results;
+                    }
+                }catch(IOException e){
+                }
+            }
+        
+    }
+
     protected void updateStatusWithMedia(StatusUpdate update, String query, int maxRankOfResult){
                     Status succeededStatus = null;
                     while(succeededStatus==null){
