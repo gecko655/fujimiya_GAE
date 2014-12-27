@@ -7,9 +7,10 @@ import twitter4j.User;
 
 public class FujimiyaRemove extends AbstractCron {
 
-    public FujimiyaRemove() {
-        // TODO Auto-generated constructor stub
-    }
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected void twitterCron() {
