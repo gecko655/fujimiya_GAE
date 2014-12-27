@@ -29,6 +29,8 @@ import com.google.api.services.customsearch.model.Search;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -127,8 +129,12 @@ public abstract class AbstractCron extends HttpServlet{
 }
     
     private boolean isInBlackList(String url) {
-        Query q = new Query("ImageUrl").setFilter(new FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, url));
-        return ds.prepare(q).asIterator().hasNext();
+        try {
+            ds.get(KeyFactory.createKey("NotFujimiya", url));
+        } catch (EntityNotFoundException e) {
+            return false;//There isn't the url in blacklist.
+        }
+        return true;//There is the url in blacklist.
     }
 
     private Search getSearchResult(String query, int maxRankOfResult) throws IOException {
