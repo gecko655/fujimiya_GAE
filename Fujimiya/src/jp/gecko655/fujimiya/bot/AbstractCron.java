@@ -31,9 +31,6 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 
 public abstract class AbstractCron extends HttpServlet{
 
@@ -110,7 +107,7 @@ public abstract class AbstractCron extends HttpServlet{
                 }
             }
             //If execution comes here, connection has failed 10 times.
-            throw new ConnectException();
+            throw new ConnectException("Connection failed 10 times");
 
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block

@@ -7,13 +7,11 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
-import twitter4j.MediaEntity;
 import twitter4j.Paging;
 import twitter4j.Relationship;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.TwitterException;
-import twitter4j.URLEntity;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -76,7 +74,7 @@ public class FujimiyaReply extends AbstractCron {
                     
                     StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ");
                     update.setInReplyToStatusId(reply.getId());
-                    updateStatusWithMedia(update, "藤宮香織 かわいい 一週間フレンズ。",100);
+                    updateStatusWithMedia(update, "藤宮香織 かわいい 一週間フレンズ。",1000);
                 }
             }
         } catch (TwitterException e) {
