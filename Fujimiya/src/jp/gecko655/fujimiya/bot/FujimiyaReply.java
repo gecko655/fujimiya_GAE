@@ -18,8 +18,14 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
 public class FujimiyaReply extends AbstractCron {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     static final String KEY = "LastTimeStatus";
     static final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+    private static final Pattern keishouPattern = Pattern.compile("(くん|さん|君|ちゃん)$");
+    private static final Pattern whoPattern = Pattern.compile("(誰だ[^と]|だれだ[^と])");
 
     public FujimiyaReply() {
         format.setTimeZone(TimeZone.getDefault());
@@ -29,7 +35,6 @@ public class FujimiyaReply extends AbstractCron {
     protected void twitterCron() {
         MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
         try {
-            Pattern pattern = Pattern.compile("(くん|さん|君|ちゃん)$");
             Status lastStatus = (Status)memcache.get(KEY);
             List<Status> replies = twitter.getMentionsTimeline((new Paging()).count(20));
             memcache.put(KEY, replies.get(0));
@@ -43,16 +48,9 @@ public class FujimiyaReply extends AbstractCron {
                 }
                 Relationship relation = twitter.friendsFollowers().showFriendship(twitter.getId(), reply.getUser().getId());
                 if(!relation.isSourceFollowingTarget()){
-                    //follow back
-                    twitter.createFriendship(reply.getUser().getId());
-                    String userName = reply.getUser().getName();
-                    if(pattern.matcher(userName).find()){
-                    }else{
-                        userName = userName + "くん";
-                    }
-                    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+userName+"？");
-                    update.setInReplyToStatusId(reply.getId());
-                    twitter.updateStatus(update);
+                    followBack(reply);
+                }else if(whoPattern.matcher(reply.getText()).find()){
+                    //TODO make black list.
                 }else{
                     //auto reply (when fujimiya-san follows the replier)
                     
@@ -67,6 +65,19 @@ public class FujimiyaReply extends AbstractCron {
 		}
 
 
+    }
+
+    private void followBack(Status reply) throws TwitterException {
+        twitter.createFriendship(reply.getUser().getId());
+        String userName = reply.getUser().getName();
+        if(keishouPattern.matcher(userName).find()){
+        }else{
+            userName = userName + "くん";
+        }
+        StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+userName+"？");
+        update.setInReplyToStatusId(reply.getId());
+        twitter.updateStatus(update);
+        
     }
 
 }

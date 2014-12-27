@@ -15,11 +15,11 @@ public class FujimiyaRemove extends AbstractCron {
     @Override
     protected void twitterCron() {
         try {
-            long cursor = -1L;
             int friendsCount= twitter.verifyCredentials().getFriendsCount();
             if(friendsCount==0){
                 return;
             }
+            long cursor = -1L;
             while(cursor!=0L){
                 PagableResponseList<User> followers = twitter.getFriendsList(twitter.getId(), cursor);
                 for(User follower: followers){
