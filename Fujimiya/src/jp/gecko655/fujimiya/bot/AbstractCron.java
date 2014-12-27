@@ -26,6 +26,9 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.customsearch.Customsearch;
 import com.google.api.services.customsearch.model.Result;
 import com.google.api.services.customsearch.model.Search;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 
 public abstract class AbstractCron extends HttpServlet{
 
@@ -68,7 +71,7 @@ public abstract class AbstractCron extends HttpServlet{
      * @param query
      * @return
      */
-    protected InputStream getFujimiyaUrl(String query){
+    FetchedImage getFujimiyaUrl(String query){
     	return getFujimiyaUrl(query,100);
     }
     /**
@@ -78,7 +81,7 @@ public abstract class AbstractCron extends HttpServlet{
      * @param maxRankOfResult
      * @return
      */
-    protected InputStream getFujimiyaUrl(String query,int maxRankOfResult){
+    FetchedImage getFujimiyaUrl(String query,int maxRankOfResult){
         try{
             //Get SearchResult
             Search search = getSearchResult(query, maxRankOfResult);
@@ -92,7 +95,7 @@ public abstract class AbstractCron extends HttpServlet{
                 connection.setInstanceFollowRedirects(false);
                 connection.connect();
                 if(connection.getResponseCode()==200){
-                    return connection.getInputStream();
+                    return new FetchedImage(connection.getInputStream(),result.getLink());
                 }else{
                     //retry.
                 }
@@ -144,8 +147,13 @@ public abstract class AbstractCron extends HttpServlet{
                     Status succeededStatus = null;
                     while(succeededStatus==null){
                         try{
-                            update.media("fujimiya.jpg",getFujimiyaUrl(query,maxRankOfResult));
+                            FetchedImage fetchedImage = getFujimiyaUrl(query,maxRankOfResult);
+                            update.media("fujimiya.jpg",fetchedImage.getInputStream());
                             succeededStatus = twitter.updateStatus(update);
+                            DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+                            Entity imageUrlEntity = new Entity("ImageUrl",succeededStatus.getId());
+                            imageUrlEntity.setProperty("URL",fetchedImage.getUrl());
+                            ds.put(imageUrlEntity);
                             logger.log(Level.INFO,"Successfully tweeted: "+succeededStatus.getText());
                         }catch(TwitterException e){
                             logger.log(Level.INFO,"updateStatusWithMedia failed. try again. "+ e.getErrorMessage());
@@ -157,4 +165,19 @@ public abstract class AbstractCron extends HttpServlet{
     abstract protected void twitterCron();
 
 
+}
+
+class FetchedImage{
+    private InputStream in;
+    private String url;
+    public FetchedImage(InputStream in, String url) {
+        this.in = in;
+        this.url = url;
+    }
+    public InputStream getInputStream() {
+        return in;
+    }
+    public String getUrl() {
+        return url;
+    }
 }
