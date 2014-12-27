@@ -18,6 +18,9 @@ import twitter4j.URLEntity;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
@@ -55,15 +58,19 @@ public class FujimiyaReply extends AbstractCron {
                 if(!relation.isSourceFollowingTarget()){
                     followBack(reply);
                 }else if(whoPattern.matcher(reply.getText()).find()){
-                    MediaEntity[] mediaEntities = twitter.showStatus(reply.getInReplyToStatusId()).getMediaEntities();
-                    if(mediaEntities.length==0){
-                        return;
-                    }
-                    String url = mediaEntities[0].getExpandedURL();
                     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-                    Entity notFujimiya = new Entity("NotFujimiya");
-                    notFujimiya.setProperty(url, reply.getUser().getScreenName());
-                    ds.put(notFujimiya);
+                    Key key = KeyFactory.createKey("ImageUrl", reply.getInReplyToStatusId());
+                    try {
+                        Entity entity = ds.get(key);
+                        String url = (String)entity.getProperty("URL");
+                        Entity notFujimiya = new Entity("NotFujimiya",url);
+                        notFujimiya.setProperty("Reported User",reply.getUser().getScreenName());
+                        ds.put(notFujimiya);
+                    } catch (EntityNotFoundException e) {
+                        logger.log(Level.WARNING,"Image URL was not found in datastore");
+                        logger.log(Level.WARNING,e.toString());
+                        e.printStackTrace();
+                    }
                 }else{
                     //auto reply (when fujimiya-san follows the replier)
                     

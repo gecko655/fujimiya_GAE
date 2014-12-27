@@ -29,6 +29,9 @@ import com.google.api.services.customsearch.model.Search;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 
 public abstract class AbstractCron extends HttpServlet{
 
@@ -47,6 +50,7 @@ public abstract class AbstractCron extends HttpServlet{
     static Twitter twitter;
     static Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
     static Customsearch search = builder.build();
+    static DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     
     public AbstractCron() {
         logger.setLevel(Level.FINE);
@@ -91,6 +95,9 @@ public abstract class AbstractCron extends HttpServlet{
                 logger.log(Level.INFO,"query: " + query + " URL: "+result.getLink());
                 logger.log(Level.INFO,"page URL: "+result.getImage().getContextLink());
                 HttpURLConnection connection = (HttpURLConnection)(new URL(result.getLink())).openConnection();
+                if(isInBlackList(result.getLink())){
+                    continue;
+                }
                 connection.setRequestMethod("GET");
                 connection.setInstanceFollowRedirects(false);
                 connection.connect();
@@ -119,6 +126,11 @@ public abstract class AbstractCron extends HttpServlet{
         return null;
 }
     
+    private boolean isInBlackList(String url) {
+        Query q = new Query("ImageUrl").setFilter(new FilterPredicate(Entity.KEY_RESERVED_PROPERTY, FilterOperator.EQUAL, url));
+        return ds.prepare(q).asIterator().hasNext();
+    }
+
     private Search getSearchResult(String query, int maxRankOfResult) throws IOException {
             Customsearch.Cse.List list = search.cse().list(query); //$NON-NLS-1$
             
@@ -150,7 +162,6 @@ public abstract class AbstractCron extends HttpServlet{
                             FetchedImage fetchedImage = getFujimiyaUrl(query,maxRankOfResult);
                             update.media("fujimiya.jpg",fetchedImage.getInputStream());
                             succeededStatus = twitter.updateStatus(update);
-                            DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
                             Entity imageUrlEntity = new Entity("ImageUrl",succeededStatus.getId());
                             imageUrlEntity.setProperty("URL",fetchedImage.getUrl());
                             ds.put(imageUrlEntity);
