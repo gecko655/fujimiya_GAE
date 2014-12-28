@@ -153,6 +153,7 @@ public abstract class AbstractCron extends HttpServlet{
                         return results;
                     }
                 }catch(IOException e){
+                    logger.log(Level.INFO,"rand: "+e.toString());
                 }
             }
         
