@@ -31,7 +31,7 @@ public class FujimiyaReply extends AbstractCron {
     static final String KEY = "LastTimeStatus";
     static final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
     private static final Pattern keishouPattern = Pattern.compile("(くん|さん|君|ちゃん)$");
-    private static final Pattern whoPattern = Pattern.compile("( 誰$| だれ$|誰[^だで]|だれ[^だで]|誰だ[^と]?|だれだ[^と]?)");
+    private static final Pattern whoPattern = Pattern.compile("( 誰$| だれ$|誰[^だで]|だれ[^だで]|誰だ[^と]?|だれだ[^と]?| 違う$)");
 
     public FujimiyaReply() {
         format.setTimeZone(TimeZone.getDefault());
