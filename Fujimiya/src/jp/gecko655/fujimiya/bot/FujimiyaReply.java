@@ -43,14 +43,15 @@ public class FujimiyaReply extends AbstractCron {
             memcache.put(KEY, replies.get(0));
             
             for(Status reply : replies){
-            	replyLog(reply, lastStatus);
+                if(isOutOfDate(reply, lastStatus))
+                    break;
                 Relationship relation = twitter.friendsFollowers().showFriendship(twitter.getId(), reply.getUser().getId());
                 
                 if(!relation.isSourceFollowingTarget()){
                     followBack(reply);
                 }else if(whoPattern.matcher(reply.getText()).find()){
-                	// put latest image URL to black-list
-                    who(reply);	
+                    // put latest image URL to black-list
+                    who(reply);    
                 }else{
                     //auto reply (when fujimiya-san follows the replier)
                     StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" ");
@@ -61,32 +62,32 @@ public class FujimiyaReply extends AbstractCron {
         } catch (TwitterException e) {
             logger.log(Level.WARNING,e.toString());
             e.printStackTrace();
-		}
+        }
     }
 
-    private void replyLog(Status reply, Status lastStatus) {
-		 if(lastStatus == null){
-	         logger.log(Level.INFO,"memcache saved"+reply.getUser().getName()+"'s tweet at "+format.format(reply.getCreatedAt()));
-	         return;
-	     }else if(reply.getCreatedAt().getTime()-lastStatus.getCreatedAt().getTime()<=0){
-	         logger.log(Level.INFO, reply.getUser().getName()+"'s tweet at "+format.format(reply.getCreatedAt()) +" is out of date");
-	         return;
-	     }
-	}
+    private boolean isOutOfDate(Status reply, Status lastStatus) {
+         if(lastStatus == null){
+             logger.log(Level.INFO,"memcache saved"+reply.getUser().getName()+"'s tweet at "+format.format(reply.getCreatedAt()));
+         }else if(reply.getCreatedAt().getTime()-lastStatus.getCreatedAt().getTime()<=0){
+             logger.log(Level.INFO, reply.getUser().getName()+"'s tweet at "+format.format(reply.getCreatedAt()) +" is out of date");
+             return true;
+         }
+         return false;
+    }
 
-	private void followBack(Status reply) throws TwitterException {
-	    twitter.createFriendship(reply.getUser().getId());
-	    String userName = reply.getUser().getName();
-	    if(!keishouPattern.matcher(userName).find()){
-	        userName = userName + "くん";
-	    }
-	    StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+userName+"？");
-	    update.setInReplyToStatusId(reply.getId());
-	    twitter.updateStatus(update);
-	}
+    private void followBack(Status reply) throws TwitterException {
+        twitter.createFriendship(reply.getUser().getId());
+        String userName = reply.getUser().getName();
+        if(!keishouPattern.matcher(userName).find()){
+            userName = userName + "くん";
+        }
+        StatusUpdate update= new StatusUpdate("@"+reply.getUser().getScreenName()+" もしかして、あなたが"+userName+"？");
+        update.setInReplyToStatusId(reply.getId());
+        twitter.updateStatus(update);
+    }
 
-	private void who(Status reply) {
-    	DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    private void who(Status reply) {
+        DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
         Key key = KeyFactory.createKey("ImageUrl", reply.getInReplyToStatusId());
         try {
             Entity entity = ds.get(key);
@@ -99,5 +100,5 @@ public class FujimiyaReply extends AbstractCron {
             logger.log(Level.WARNING,e.toString());
             e.printStackTrace();
         }
-	}
+    }
 }

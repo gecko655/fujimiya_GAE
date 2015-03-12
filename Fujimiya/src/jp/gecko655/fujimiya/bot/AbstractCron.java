@@ -70,7 +70,7 @@ public abstract class AbstractCron extends HttpServlet{
      * @return
      */
     FetchedImage getFujimiyaUrl(String query){
-    	return getFujimiyaUrl(query,100);
+        return getFujimiyaUrl(query,100);
     }
     /**
      * Search fujimiya-san's image and return the url.
@@ -98,7 +98,7 @@ public abstract class AbstractCron extends HttpServlet{
                 if(connection.getResponseCode()==200){
                     return new FetchedImage(connection.getInputStream(),result.getLink());
                 }else{
-                	continue;
+                    continue;
                 }
             }
             //If execution comes here, connection has failed 10 times.
