@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
@@ -32,12 +31,8 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.KeyFactory;
 
+@SuppressWarnings("serial")
 public abstract class AbstractCron extends HttpServlet{
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
 
     static Logger logger = Logger.getLogger("Fujimiya"); //$NON-NLS-1$
     
@@ -103,21 +98,13 @@ public abstract class AbstractCron extends HttpServlet{
                 if(connection.getResponseCode()==200){
                     return new FetchedImage(connection.getInputStream(),result.getLink());
                 }else{
-                    //retry.
+                	continue;
                 }
             }
             //If execution comes here, connection has failed 10 times.
             throw new ConnectException("Connection failed 10 times");
 
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            logger.log(Level.SEVERE,e.toString());
-            e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            logger.log(Level.SEVERE,e.toString());
-            e.printStackTrace();
-        } catch (Exception e) {
             // TODO Auto-generated catch block
             logger.log(Level.SEVERE,e.toString());
             e.printStackTrace();
@@ -142,44 +129,39 @@ public abstract class AbstractCron extends HttpServlet{
             list.setSearchType("image"); //$NON-NLS-1$
             list.setNum(10L);
             list.setImgSize("huge").setImgSize("large").setImgSize("medium").setImgSize("xlarge").setImgSize("xxlarge");
+            
             Search results = null;
-            while(true){
+            while(results == null){
                 try{
                     long rand = (long)(Math.random()*maxRankOfResult+1);
                     list.setStart(rand);
                     logger.log(Level.INFO,"rand: "+rand);
                     results = list.execute();
-                    if(results != null){
-                        return results;
-                    }
                 }catch(IOException e){
                     logger.log(Level.INFO,"rand: "+e.toString());
                 }
             }
-        
+            return results;
     }
 
     protected void updateStatusWithMedia(StatusUpdate update, String query, int maxRankOfResult){
-                    Status succeededStatus = null;
-                    while(succeededStatus==null){
-                        try{
-                            FetchedImage fetchedImage = getFujimiyaUrl(query,maxRankOfResult);
-                            update.media("fujimiya.jpg",fetchedImage.getInputStream());
-                            succeededStatus = twitter.updateStatus(update);
-                            Entity imageUrlEntity = new Entity("ImageUrl",succeededStatus.getId());
-                            imageUrlEntity.setProperty("URL",fetchedImage.getUrl());
-                            ds.put(imageUrlEntity);
-                            logger.log(Level.INFO,"Successfully tweeted: "+succeededStatus.getText());
-                        }catch(TwitterException e){
-                            logger.log(Level.INFO,"updateStatusWithMedia failed. try again. "+ e.getErrorMessage());
-                        }
-                    }
-        
+        Status succeededStatus = null;
+        while(succeededStatus==null){
+            try{
+                FetchedImage fetchedImage = getFujimiyaUrl(query,maxRankOfResult);
+                update.media("fujimiya.jpg",fetchedImage.getInputStream());
+                succeededStatus = twitter.updateStatus(update);
+                Entity imageUrlEntity = new Entity("ImageUrl",succeededStatus.getId());
+                imageUrlEntity.setProperty("URL",fetchedImage.getUrl());
+                ds.put(imageUrlEntity);
+                logger.log(Level.INFO,"Successfully tweeted: "+succeededStatus.getText());
+            }catch(TwitterException e){
+                logger.log(Level.INFO,"updateStatusWithMedia failed. try again. "+ e.getErrorMessage());
+            }
+        }
     }
     
     abstract protected void twitterCron();
-
-
 }
 
 class FetchedImage{
