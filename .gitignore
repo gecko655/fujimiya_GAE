@@ -28,6 +28,9 @@ Fujimiya/war/WEB-INF/classes/
 Fujimiya/war/WEB-INF/appengine-generated/
 
 *.swp
+.DS_Store
+.google_apis/
+.settings/
 
 # Secret properties
 secretkeys.properties
