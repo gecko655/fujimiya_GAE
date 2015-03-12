@@ -2,12 +2,8 @@ package jp.gecko655.fujimiya.bot;
 
 import twitter4j.StatusUpdate;
 
+@SuppressWarnings("serial")
 public class FujimiyaLunch extends AbstractCron{
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
 
     @Override
     protected void twitterCron() {
