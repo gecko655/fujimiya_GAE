@@ -145,22 +145,28 @@ public abstract class AbstractCron extends HttpServlet{
     }
 
     protected void updateStatusWithMedia(StatusUpdate update, String query, int maxRankOfResult){
-        Status succeededStatus = null;
-        while(succeededStatus==null){
+        FetchedImage fetchedImage = getFujimiyaUrl(query,maxRankOfResult);
+        update.media("fujimiya.jpg",fetchedImage.getInputStream());
+        for(int i=0;i<10;i++){
             try{
-                FetchedImage fetchedImage = getFujimiyaUrl(query,maxRankOfResult);
-                update.media("fujimiya.jpg",fetchedImage.getInputStream());
-                succeededStatus = twitter.updateStatus(update);
-                Entity imageUrlEntity = new Entity("ImageUrl",succeededStatus.getId());
-                imageUrlEntity.setProperty("URL",fetchedImage.getUrl());
-                ds.put(imageUrlEntity);
+                Status succeededStatus = twitter.updateStatus(update);
                 logger.log(Level.INFO,"Successfully tweeted: "+succeededStatus.getText());
+                storeImageUrl(succeededStatus,fetchedImage);
+                return;
             }catch(TwitterException e){
                 logger.log(Level.INFO,"updateStatusWithMedia failed. try again. "+ e.getErrorMessage());
             }
         }
+        logger.log(Level.SEVERE,"updateStatusWithMedia failed 10 times. Stop.");
     }
     
+    
+    private void storeImageUrl(Status succeededStatus, FetchedImage fetchedImage) {
+        Entity imageUrlEntity = new Entity("ImageUrl",succeededStatus.getId());
+        imageUrlEntity.setProperty("URL",fetchedImage.getUrl());
+        ds.put(imageUrlEntity);
+    }
+
     abstract protected void twitterCron();
 }
 
