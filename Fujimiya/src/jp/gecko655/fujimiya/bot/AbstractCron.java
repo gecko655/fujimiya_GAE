@@ -121,27 +121,23 @@ public abstract class AbstractCron extends HttpServlet{
         return true;//There is the url in blacklist.
     }
 
+    static private int pageSize = 10;
     private Search getSearchResult(String query, int maxRankOfResult) throws IOException {
+            
+            if(maxRankOfResult>100-pageSize+1)
+                maxRankOfResult=100-pageSize+1;
             Customsearch.Cse.List list = search.cse().list(query); //$NON-NLS-1$
             
             list.setCx(Messages.getString("AbstractCron.cx")); //$NON-NLS-1$
             list.setKey(Messages.getString("AbstractCron.key")); //$NON-NLS-1$
             list.setSearchType("image"); //$NON-NLS-1$
-            list.setNum(10L);
+            list.setNum((long)pageSize);
             list.setImgSize("huge").setImgSize("large").setImgSize("medium").setImgSize("xlarge").setImgSize("xxlarge");
             
-            Search results = null;
-            while(results == null){
-                try{
-                    long rand = (long)(Math.random()*maxRankOfResult+1);
-                    list.setStart(rand);
-                    logger.log(Level.INFO,"rand: "+rand);
-                    results = list.execute();
-                }catch(IOException e){
-                    logger.log(Level.INFO,"rand: "+e.toString());
-                }
-            }
-            return results;
+            long rand = (long)(Math.random()*maxRankOfResult+1);
+            list.setStart(rand);
+            logger.log(Level.INFO,"rand: "+rand);
+            return list.execute();
     }
 
     protected void updateStatusWithMedia(StatusUpdate update, String query, int maxRankOfResult){
