@@ -41,6 +41,10 @@ public class FujimiyaReply extends AbstractCron {
             Status lastStatus = (Status)memcache.get(KEY);
             List<Status> replies = twitter.getMentionsTimeline((new Paging()).count(20));
             memcache.put(KEY, replies.get(0));
+             if(lastStatus == null){
+                 logger.log(Level.INFO,"memcache saved. Stop. "+replies.get(0).getUser().getName()+"'s tweet at "+format.format(replies.get(0).getCreatedAt()));
+                 return;
+             }
             
             for(Status reply : replies){
                 if(isOutOfDate(reply, lastStatus))
@@ -66,9 +70,7 @@ public class FujimiyaReply extends AbstractCron {
     }
 
     private boolean isOutOfDate(Status reply, Status lastStatus) {
-         if(lastStatus == null){
-             logger.log(Level.INFO,"memcache saved"+reply.getUser().getName()+"'s tweet at "+format.format(reply.getCreatedAt()));
-         }else if(reply.getCreatedAt().getTime()-lastStatus.getCreatedAt().getTime()<=0){
+         if(reply.getCreatedAt().getTime()-lastStatus.getCreatedAt().getTime()<=0){
              logger.log(Level.INFO, reply.getUser().getName()+"'s tweet at "+format.format(reply.getCreatedAt()) +" is out of date");
              return true;
          }
