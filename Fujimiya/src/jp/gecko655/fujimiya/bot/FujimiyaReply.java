@@ -70,11 +70,11 @@ public class FujimiyaReply extends AbstractCron {
     }
 
     private boolean isOutOfDate(Status reply, Status lastStatus) {
-         if(reply.getCreatedAt().getTime()-lastStatus.getCreatedAt().getTime()<=0){
-             logger.log(Level.INFO, reply.getUser().getName()+"'s tweet at "+format.format(reply.getCreatedAt()) +" is out of date");
-             return true;
-         }
-         return false;
+        if(reply.getCreatedAt().getTime()-lastStatus.getCreatedAt().getTime()<=0){
+            logger.log(Level.INFO, reply.getUser().getName()+"'s tweet at "+format.format(reply.getCreatedAt()) +" is out of date");
+            return true;
+        }
+        return false;
     }
 
     private void followBack(Status reply) throws TwitterException {
@@ -97,6 +97,7 @@ public class FujimiyaReply extends AbstractCron {
             Entity notFujimiya = new Entity("NotFujimiya",url);
             notFujimiya.setProperty("Reported User",reply.getUser().getScreenName());
             ds.put(notFujimiya);
+            logger.log(Level.INFO, reply.getUser().getName()+"'s report is successfully saved: "+ url);
         } catch (EntityNotFoundException e) {
             logger.log(Level.WARNING,"Image URL was not found in datastore");
             logger.log(Level.WARNING,e.toString());
