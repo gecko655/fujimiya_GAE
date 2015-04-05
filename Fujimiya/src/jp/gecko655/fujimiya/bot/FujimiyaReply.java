@@ -13,19 +13,9 @@ import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.TwitterException;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
-
 @SuppressWarnings("serial")
 public class FujimiyaReply extends AbstractCron {
     
-    static final String KEY = "LastTimeStatus";
     static final DateFormat format = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
     private static final Pattern keishouPattern = Pattern.compile("(くん|さん|君|ちゃん)$");
     private static final Pattern whoPattern = Pattern.compile("( 誰$| だれ$|誰[^だで]|だれ[^だで]|誰だ[^と]?|だれだ[^と]?| 違う$)");
@@ -36,11 +26,10 @@ public class FujimiyaReply extends AbstractCron {
 
     @Override
     protected void twitterCron() {
-        MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
         try {
-            Status lastStatus = (Status)memcache.get(KEY);
+            Status lastStatus = DBConnection.getLastStatus();
             List<Status> replies = twitter.getMentionsTimeline((new Paging()).count(20));
-            memcache.put(KEY, replies.get(0));
+            DBConnection.setLastStatus(replies.get(0));
              if(lastStatus == null){
                  logger.log(Level.INFO,"memcache saved. Stop. "+replies.get(0).getUser().getName()+"'s tweet at "+format.format(replies.get(0).getCreatedAt()));
                  return;
@@ -89,19 +78,6 @@ public class FujimiyaReply extends AbstractCron {
     }
 
     private void who(Status reply) {
-        DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-        Key key = KeyFactory.createKey("ImageUrl", reply.getInReplyToStatusId());
-        try {
-            Entity entity = ds.get(key);
-            String url = (String)entity.getProperty("URL");
-            Entity notFujimiya = new Entity("NotFujimiya",url);
-            notFujimiya.setProperty("Reported User",reply.getUser().getScreenName());
-            ds.put(notFujimiya);
-            logger.log(Level.INFO, reply.getUser().getName()+"'s report is successfully saved: "+ url);
-        } catch (EntityNotFoundException e) {
-            logger.log(Level.WARNING,"Image URL was not found in datastore");
-            logger.log(Level.WARNING,e.toString());
-            e.printStackTrace();
-        }
+        DBConnection.storeImageUrlToBlackList(reply);
     }
 }

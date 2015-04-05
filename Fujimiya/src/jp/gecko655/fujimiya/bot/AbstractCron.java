@@ -25,11 +25,6 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.customsearch.Customsearch;
 import com.google.api.services.customsearch.model.Result;
 import com.google.api.services.customsearch.model.Search;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.KeyFactory;
 
 @SuppressWarnings("serial")
 public abstract class AbstractCron extends HttpServlet{
@@ -44,7 +39,6 @@ public abstract class AbstractCron extends HttpServlet{
     static Twitter twitter;
     static Customsearch.Builder builder = new Customsearch.Builder(new NetHttpTransport(), new JacksonFactory(), null).setApplicationName("Google"); //$NON-NLS-1$
     static Customsearch search = builder.build();
-    static DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     
     public AbstractCron() {
         logger.setLevel(Level.FINE);
@@ -89,7 +83,7 @@ public abstract class AbstractCron extends HttpServlet{
                 logger.log(Level.INFO,"query: " + query + " URL: "+result.getLink());
                 logger.log(Level.INFO,"page URL: "+result.getImage().getContextLink());
                 HttpURLConnection connection = (HttpURLConnection)(new URL(result.getLink())).openConnection();
-                if(isInBlackList(result.getLink())){
+                if(DBConnection.isInBlackList(result.getLink())){
                     continue;
                 }
                 connection.setRequestMethod("GET");
@@ -112,15 +106,6 @@ public abstract class AbstractCron extends HttpServlet{
         return null;
 }
     
-    private boolean isInBlackList(String url) {
-        try {
-            ds.get(KeyFactory.createKey("NotFujimiya", url));
-        } catch (EntityNotFoundException e) {
-            return false;//There isn't the url in blacklist.
-        }
-        return true;//There is the url in blacklist.
-    }
-
     static private int pageSize = 10;
     private Search getSearchResult(String query, int maxRankOfResult) throws IOException {
         if(maxRankOfResult>100-pageSize+1)
@@ -146,7 +131,7 @@ public abstract class AbstractCron extends HttpServlet{
             try{
                 Status succeededStatus = twitter.updateStatus(update);
                 logger.log(Level.INFO,"Successfully tweeted: "+succeededStatus.getText());
-                storeImageUrl(succeededStatus,fetchedImage);
+                DBConnection.storeImageUrl(succeededStatus,fetchedImage);
                 return;
             }catch(TwitterException e){
                 logger.log(Level.INFO,"updateStatusWithMedia failed. try again. "+ e.getErrorMessage());
@@ -156,12 +141,6 @@ public abstract class AbstractCron extends HttpServlet{
     }
     
     
-    private void storeImageUrl(Status succeededStatus, FetchedImage fetchedImage) {
-        Entity imageUrlEntity = new Entity("ImageUrl",succeededStatus.getId());
-        imageUrlEntity.setProperty("URL",fetchedImage.getUrl());
-        ds.put(imageUrlEntity);
-    }
-
     abstract protected void twitterCron();
 }
 
