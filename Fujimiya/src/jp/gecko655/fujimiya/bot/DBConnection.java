@@ -37,6 +37,7 @@ public class DBConnection {
             Entity entity = ds.get(key);
             String url = (String)entity.getProperty("URL");
             Entity notFujimiya = new Entity("NotFujimiya",url);
+            notFujimiya.setProperty("Reported User", reply.getUser().getScreenName());
             ds.put(notFujimiya);
             return true;
         } catch (EntityNotFoundException e) {
