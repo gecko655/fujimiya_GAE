@@ -1,6 +1,9 @@
 fujimiyaBot
 ===========
 
+## Deprecated
+Google App Engineから脱却するため、<https://github.com/gecko655/fujimiya>に移行しました。
+
 ## 「わ、私... 月曜日には記憶がリセットされちゃうの...。」
 
 Google App Engine上で動作するTwitter Botの制御プログラムです。
