@@ -1,4 +1,4 @@
-fujimiyaBot
+fujimiya_GAE
 ===========
 
 ## Deprecated
